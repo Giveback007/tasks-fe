@@ -1,16 +1,27 @@
 import { debounceById } from "$lib/util/utils.util";
-import { data, timer } from "./data.store";
+import { audio, data, playSound, timer } from "./data.store";
 import { getData, updData } from "./store";
 
 export function initStore() {
+    let prevState = 'PAUSE' as Timer['state'];
+    let prevTime = 0;
     timer.subscribe(x => {
+        console.log(x.state);
         const _data = getData();
 
-        if (_data['TIMER']?.time === x.time) return;
-        console.log(x)
+        if (prevTime === x.time) return;
+
+        if (x.state !== prevState && x.state === 'PAUSE') {
+            audio.pause();
+        } else {
+            playSound(x.sound_start, x.sound_startTimes);
+        }
+
+        prevTime = x.time;
+        prevState = x.state;
 
         _data['TIMER'] = x;
-        updData(_data);
+        updData(_data)
     });
 
     data.subscribe(dict =>

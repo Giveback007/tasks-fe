@@ -75,12 +75,7 @@ export const nextTimer = () => {
         PAUSE: 'FOCUS'
     } as const)[t.state];
 
-    if (nextState === 'PAUSE') {
-        audio.pause();
-        soundId = 0;
-    } else {
-        playSound(t.sound_start, t.sound_startTimes);
-    }
+    if (nextState === 'PAUSE') soundId = 0;
 
     updItem({
         ...t,
