@@ -13,6 +13,10 @@ type Timer = _Base & {
     focus: num;
     rest: num;
     state: 'FOCUS' | 'REST' | 'PAUSE';
+    sound_start: str;
+    sound_startTimes: num;
+    sound_end: str;
+    sound_endTimes: num;
 }
 
 type Task = _Base & {
@@ -34,4 +38,5 @@ type Group = _Base & {
     name: str;
 }
 
-type DataDict = Dict<Task | List | Group | Timer>;
+type AllData = Task | List | Group | Timer;
+type DataDict = Dict<AllData>;

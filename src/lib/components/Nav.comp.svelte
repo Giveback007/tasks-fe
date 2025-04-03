@@ -1,8 +1,9 @@
 <script lang="ts">
     import { page } from "$app/state";
     import { TIMER_STATE_TITLES } from "$lib/consts";
-    import { _time, timer } from "$lib/store/data.store";
+    import { _time, nextTimer, timer } from "$lib/store/data.store";
     import { groups, updItem } from "$lib/store/store";
+    import { onDestroy, onMount } from "svelte";
 
     let groupTabs: [str, str][] = $state([]);
     let selGroup: str = $state("");
@@ -26,30 +27,10 @@
             <li>
                 <strong class="flex items-center text-nowrap">
                     <button
-                        class="outline"
+                        class={$_time.mode ? "outline" : ""}
                         style="margin: 0; padding: 0.1rem 0.15rem;"
                         title={TIMER_STATE_TITLES[$timer.state]}
-                        onclick={() => {
-                            const o = {...$timer};
-                            switch ($timer.state) {
-                                case 'FOCUS':
-                                    o.state = 'REST';
-                                    o.start = Date.now();
-                                    break;
-                                case 'REST':
-                                    o.state = 'PAUSE';
-                                    o.start = Date.now();
-                                    break;
-                                case 'PAUSE':
-                                    o.state = 'FOCUS';
-                                    o.start = Date.now();
-                                    break;
-                                default:
-                                    break;
-                            }
-
-                            updItem(o);
-                        }}
+                        onclick={nextTimer}
                     >
                         {#if $timer.state === 'PAUSE'}
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-[1.5em] inline-block mb-[0.1em]">
@@ -107,5 +88,9 @@
             </li>
         </ul>
     </nav>
-    <progress value="{$_time.prc}" max="100" class="relative" style="border-radius: 0;"></progress>
+    {#if $_time.mode}
+        <progress value="{$_time.prc}" max="100" class="relative" style="border-radius: 0;"></progress>
+    {:else}
+        <progress value="0" max="100" class="relative" style="border-radius: 0;"></progress>
+    {/if}
 </div>

@@ -2,8 +2,6 @@ import { lsWritable } from "$lib/util/store.util";
 import { writable } from "svelte/store";
 import { data, initTimer, timer } from "./data.store";
 
-
-
 export const listIsOpen = lsWritable<Dict<bol>>({}, 'listIsOpen');
 
 export const groups = writable<_Group[]>([]);
@@ -17,7 +15,7 @@ export type _List = List & { tasks: Task[]; nDone: num; nTasks: num; };
 type PartialExcept<T, K extends keyof T> = Partial<T> & Pick<T, K>;
 
 export function updItem(
-    x: PartialExcept<Task | List | Group | Timer, 'id'>,
+    x: PartialExcept<AllData, 'id'>,
     act: 'del' | 'upd' = 'upd',
     doSet = true
 ) {
@@ -43,16 +41,6 @@ export function updMulti(
 export const getData = () => _data;
 
 let _data: DataDict = {};
-setTimeout(() => {
-    timer.subscribe(x => {
-        if (_data['TIMER']?.time === x.time) return;
-        console.log(x)
-
-        _data['TIMER'] = x;
-        updData(_data);
-    });
-});
-
 export function updData(dict: DataDict) {
     _data = dict;
     console.log(
@@ -67,7 +55,7 @@ export function updData(dict: DataDict) {
         tasks: {} as Dict<Task>,
         lists: {} as Dict<_List>,
         groups: {} as Dict<_Group>,
-        timer: dict['TIMER'] as Timer || initTimer,
+        timer: { ...initTimer, ...dict['TIMER'] } as Timer,
     }
 
     for (let id in dict) {

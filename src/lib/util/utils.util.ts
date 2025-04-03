@@ -66,10 +66,14 @@ export function formatTime(ms: number) {
 
     const minutes = Math.floor(totalSeconds / 60);
     const seconds = totalSeconds % 60;
+    const hours = Math.floor(minutes / 60)
 
-    const formattedMinutes = String(minutes).padStart(2, '0');
+    const formattedMinutes = String(hours ? minutes % 60 : minutes).padStart(2, '0');
     const formattedSeconds = String(seconds).padStart(2, '0');
 
     // Return in MM:SS format
-    return `${formattedMinutes}:${formattedSeconds}`;
-   }
+    return `${hours ? hours + ':' : ''}${formattedMinutes}:${formattedSeconds}`;
+}
+
+export const wait = (ms: number) =>
+    new Promise(res => setTimeout(res, ms));

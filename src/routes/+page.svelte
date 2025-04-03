@@ -22,7 +22,7 @@
             </linearGradient>
           </defs>
           <circle id="shadow-circle" class="filter drop-shadow" stroke="#2D2D2D" stroke-width="3px" cx="50%" cy="50%" r="15.9155"/>
-          <circle id="timer-circle" class="-rotate-90 origin-center" stroke="url(#timer-ring-gradient)" stroke-dasharray="{$_time.prc}, 100" stroke-width="3px" stroke-linecap="round" cx="50%" cy="50%" r="15.9155"/>
+          <circle id="timer-circle" class="-rotate-90 origin-center {$_time.mode ? '' : 'hidden'}" stroke="url(#timer-ring-gradient)" stroke-dasharray="{$_time.prc}, 100" stroke-width="3px" stroke-linecap="round" cx="50%" cy="50%" r="15.9155"/>
         </svg>
       </div>
     </div>

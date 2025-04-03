@@ -1,7 +1,15 @@
 <script lang="ts">
+    import { playSound, timer } from "$lib/store/data.store";
     import { getData, groups, updItem, type _Group } from "$lib/store/store";
     import { useSortable } from "$lib/util/sortable.util.svelte";
     import { uuid } from "$lib/util/utils.util";
+    import type { PageData } from "./$types";
+
+    const {
+        data: pageData
+    }: {
+        data: PageData
+    } = $props();
 
     let delModal: null | _Group = $state(null);
     let editModal: null | _Group = $state(null);
@@ -49,8 +57,8 @@
     });
 </script>
 
-<h1 class="pt-6 ml-3 pb-1">Settings</h1>
-
+<hr />
+<h3>Groups</h3>
 <div class="ml-2">
     <button
         onclick={createGroup}
@@ -83,7 +91,7 @@
                 <th>{group.name}</th>
                 <td>{group.lists.length}</td>
                 <td>{group.nDone}/{group.nTasks}</td>
-                <td>{prc > -1 ? prc : 100}%</td>
+                <td>{prc > -1 ? prc : 0}%</td>
                 <td class="w-6" style="padding: 0 0.25rem;">
                     <button
                         aria-label="edit-group"
@@ -116,6 +124,90 @@
         {/each}
         </tbody>
     </table>
+</div>
+
+<hr />
+<h3>Sounds</h3>
+<div class="px-2">
+    {#if typeof pageData.sounds === 'string'}
+        <h3>ERROR: {pageData.sounds}</h3>
+    {:else}
+        <h5>Start:</h5>
+        <!-- svelte-ignore a11y_no_redundant_roles -->
+        <fieldset role="group">
+            <select
+                name="select-sound"
+                aria-label="Select"
+                onchange={(e) => updItem({ ...$timer, sound_start: (e.target as any).value })}
+            >
+                <!-- <option selected disabled value="">Select</option>
+                <option>Solid</option> -->
+                {#each pageData.sounds as item}
+                    <option
+                        value={item.file}
+                        selected={$timer.sound_start === item.file}
+                    >{item.name}</option>
+                {/each}
+            </select>
+            <input
+                type="number"
+                name="number"
+                min="1"
+                max='10'
+                placeholder="Times"
+                aria-label="Times"
+                class="max-w-24"
+                bind:value={$timer.sound_startTimes}
+                onchange={(e) => updItem({ ...$timer, sound_startTimes: (e.target as any).value })}
+            >
+            <button
+                onclick={() => playSound($timer.sound_start, $timer.sound_startTimes)}
+                aria-label="Play Sound"
+            >
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.347a1.125 1.125 0 0 1 0 1.972l-11.54 6.347a1.125 1.125 0 0 1-1.667-.986V5.653Z" />
+                </svg>
+            </button>
+        </fieldset>
+
+        <h5>End:</h5>
+        <!-- svelte-ignore a11y_no_redundant_roles -->
+        <fieldset role="group">
+            <select
+                name="select-sound"
+                aria-label="Select"
+                onchange={(e) => updItem({ ...$timer, sound_end: (e.target as any).value })}
+            >
+                <!-- <option selected disabled value="">Select</option>
+                <option>Solid</option> -->
+                {#each pageData.sounds as item}
+                    <option
+                        value={item.file}
+                        selected={$timer.sound_end === item.file}
+                    >{item.name}</option>
+                {/each}
+            </select>
+            <input
+                type="number"
+                name="number"
+                min="1"
+                max='10'
+                placeholder="Times"
+                aria-label="Times"
+                class="max-w-24"
+                bind:value={$timer.sound_endTimes}
+                onchange={(e) => updItem({ ...$timer, sound_endTimes: (e.target as any).value })}
+            >
+            <button
+                onclick={() => playSound($timer.sound_end, $timer.sound_endTimes)}
+                aria-label="Play Sound"
+            >
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.347a1.125 1.125 0 0 1 0 1.972l-11.54 6.347a1.125 1.125 0 0 1-1.667-.986V5.653Z" />
+                </svg>
+            </button>
+        </fieldset>
+    {/if}
 </div>
 
 {#if delModal}

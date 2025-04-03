@@ -3,14 +3,12 @@ import { debounceById } from "$lib/util/utils.util";
 import { data } from "./data.store";
 import { updData } from "./store";
 
-// const clone = <T>(x: T): T => JSON.parse(JSON.stringify(x));
-
 let serverDict: DataDict = {};
 let localDict: DataDict = {};
 
 function syncDict(ws: WebSocket, type: 'send' | 'receive') {
     const newDict: DataDict = {};
-    let updates: (Task | List | Group | Timer)[] = [];
+    let updates: (AllData)[] = [];
 
     const allIds = new Set([
         ...Object.values(serverDict),

@@ -18,7 +18,7 @@ export const sStore = storageFactory('sessionStorage');
 
 const lsWritableKeys = new Set<str>();
 export function lsWritable<T>(initState: T, id: str) {
-    if (lsWritableKeys.has(id)) throw `This LS id is already in use: "${id}"`;
+    // if (lsWritableKeys.has(id)) throw `This LS id is already in use: "${id}"`;
     if (!browser || !lStore.hasStore()) return writable<T>(initState);
 
     const lsKeyId = `${lsAppId}__[${id}]`;

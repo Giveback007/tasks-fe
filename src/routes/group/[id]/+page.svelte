@@ -122,7 +122,7 @@
                 </td>
                 <th>{list.name}</th>
                 <td class="w-24">{list.nDone} / {list.nTasks}</td>
-                <td class="w-6">{prc > -1 ? prc : 100}%</td>
+                <td class="w-6">{prc > -1 ? prc : 0}%</td>
                 <td class="w-6" style="padding: 0 0.25rem;">
                     <button
                         aria-label="edit-group"
