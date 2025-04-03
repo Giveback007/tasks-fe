@@ -1,8 +1,9 @@
+import { PUBLIC_WS } from "$env/static/public";
 import { debounceById } from "$lib/util/utils.util";
 import { data } from "./data.store";
 import { updData } from "./store";
 
-const clone = <T>(x: T): T => JSON.parse(JSON.stringify(x));
+// const clone = <T>(x: T): T => JSON.parse(JSON.stringify(x));
 
 let serverDict: DataDict = {};
 let localDict: DataDict = {};
@@ -37,7 +38,7 @@ function syncDict(ws: WebSocket, type: 'send' | 'receive') {
 }
 
 export function initStoreSync() {
-    const ws = new WebSocket('ws://localhost:8080');
+    const ws = new WebSocket(PUBLIC_WS);
     ws.addEventListener('open', () => {
         data.subscribe(dict => {
             localDict = dict;
