@@ -2,16 +2,7 @@
     import { getData, updItem, type _List } from '$lib/store/store';
     import { useSortable } from '$lib/util/sortable.util.svelte';
     import { uuid } from '$lib/util/utils.util';
-
-    const colors = [
-        "bg-gray-800",
-        "bg-lime-600",
-        "bg-red-400",
-        "bg-cyan-500",
-        "bg-violet-500 ",
-        "bg-pink-500",
-        "bg-stone-50",
-    ]
+    import ColorsSel from './ColorsSel.comp.svelte';
 
     function addItem(text: string) {
         if (!text.trim()) return;
@@ -113,28 +104,12 @@
                     onchange={() => updItem({ id: item.id, done: !item.done })}
                 />
 
-                <details class="dropdown" style="margin: 0;">
-                    <div class="
-
-                    ">
-
-                    </div>
-                    <summary style="padding: 0; height: auto;" class="ml-1">
-                        <div class="{colors[item.clr || 0]} {item.clr || 0 ? 'hover:opacity-50' : 'hover:bg-gray-700'} size-4.5 rounded-xs"></div>
-                    </summary>
-                    <ul style="margin: 0;">
-                        {#each colors as clr, i}
-                            <!-- svelte-ignore a11y_click_events_have_key_events -->
-                            <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
-                            <li
-                                class="{clr} min-w-10 min-h-6 hover:opacity-85 active:opacity-60 cursor-pointer"
-                                onclick={() => {
-                                    updItem({...item, clr: i })
-                                }}
-                            ></li>
-                        {/each}
-                    </ul>
-                </details>
+                <div class="ml-1">
+                    <ColorsSel
+                        onClrSel={(clr) => updItem({...item, clr })}
+                        selClr={item.clr}
+                    />
+                </div>
 
                 <span class="ml-2.5 flex-grow {item.done ? 'line-through text-gray-500' : ''}" >
                     {#if item.id === taskEditId}

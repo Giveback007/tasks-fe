@@ -1,5 +1,6 @@
 <script lang="ts">
     import Checklist from "$lib/components/Checklist.comp.svelte";
+    import ColorsSel from "$lib/components/ColorsSel.comp.svelte";
     import Tabs from "$lib/components/Tabs.comp.svelte";
     import { getData, groups, listIsOpen, updItem, type _List } from "$lib/store/store";
     import { useSortable } from "$lib/util/sortable.util.svelte";
@@ -83,10 +84,15 @@
             style="margin: 0.25rem;"
         >
             <!-- svelte-ignore a11y_no_redundant_roles -->
-            <summary role="button" style="margin: 0; border-radius: 0;">
-                <strong>{list.name}:</strong>
-                {list.nDone}/{list.tasks.length}
-                {prc > -1 ? prc : 100}%
+            <summary role="button" style="margin: 0; border-radius: 0;" class="flex">
+                <div class="flex flex-1">
+                    <div class="{list.clr} size-6 mr-2 my-auto rounded-md"></div>
+                    <div class="align-middle my-auto pt-0.5">
+                        <strong>{list.name}:</strong>
+                        {list.nDone}/{list.tasks.length}
+                        {prc > -1 ? prc : 100}%
+                    </div>
+                </div>
             </summary>
             <Checklist list={list} />
         </details>
@@ -99,11 +105,12 @@
         Create New List
     </button>
 </div>
-<div class="overflow-auto">
+<div class="overflow-auto min-h-96">
     <table>
         <thead>
             <tr>
-                <th></th>
+                <th class="w-4"></th>
+                <!-- <th></th> -->
                 <th>Group</th>
                 <th>Tasks</th>
                 <th>%</th>
@@ -115,10 +122,20 @@
         {#each lists as list (list)}
             {@const prc = Math.round(list.nDone / list.nTasks * 100)}
             <tr data-id={list.id}>
-                <td class="w-4 sort-handle hover:cursor-move">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                        <path d="M7 2a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0zM7 5a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0zM7 8a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm-3 3a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm-3 3a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
-                    </svg>
+                <td style="padding-right: 0;">
+                    <div class="flex">
+                        <div class="hover:cursor-move sort-handle m-auto">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" class="size-5">
+                                <path d="M7 2a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0zM7 5a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0zM7 8a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm-3 3a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm-3 3a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
+                            </svg>
+                        </div>
+                        <div class="m-auto">
+                            <ColorsSel
+                                onClrSel={(clr) => updItem({...list, clr })}
+                                selClr={list.clr}
+                            />
+                        </div>
+                    </div>
                 </td>
                 <th>{list.name}</th>
                 <td class="w-24">{list.nDone} / {list.nTasks}</td>
@@ -208,3 +225,12 @@
     </article>
 </dialog>
 {/if}
+
+<style>
+    .overflow-auto {
+        overflow: auto !important;
+        @media (width >= 500px) {
+            overflow: visible !important;
+        }
+    }
+</style>

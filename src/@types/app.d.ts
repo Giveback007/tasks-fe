@@ -24,13 +24,14 @@ type Task = _Base & {
     txt: str;
     done: bol;
     listId: str;
-    clr?: num;
+    clr?: str;
 };
 
 type List = _Base & {
     t: 'L';
     name: str;
     groupId: str;
+    clr?: str;
 };
 
 type Group = _Base & {
