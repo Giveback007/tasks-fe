@@ -60,3 +60,16 @@ export function debounceById(
 export const uuid = () => "10000000-1000-4000-8000-100000000000".replace(/[018]/g, c =>
     (+c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> +c / 4).toString(16)
 );
+
+export function formatTime(ms: number) {
+    const totalSeconds = Math.floor(ms / 1000);
+
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
+
+    const formattedMinutes = String(minutes).padStart(2, '0');
+    const formattedSeconds = String(seconds).padStart(2, '0');
+
+    // Return in MM:SS format
+    return `${formattedMinutes}:${formattedSeconds}`;
+   }

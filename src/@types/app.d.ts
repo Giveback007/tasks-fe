@@ -1,23 +1,37 @@
-type Task = {
-    t: 'T';
+type _Base = {
     id: str;
+    idx?: num;
+    /** Last update time of obj */
+    time: num;
+    del?: bol;
+}
+
+type Timer = _Base & {
+    id: 'TIMER';
+    t: 'timer';
+    start: num;
+    focus: num;
+    rest: num;
+    state: 'FOCUS' | 'REST' | 'PAUSE';
+}
+
+type Task = _Base & {
+    t: 'T';
     txt: str;
     done: bol;
     listId: str;
-    idx?: num;
+    clr?: num;
 };
 
-type List = {
+type List = _Base & {
     t: 'L';
-    id: str;
     name: str;
     groupId: str;
-    idx?: num;
 };
 
-type Group = {
+type Group = _Base & {
     t: 'G';
-    id: str;
     name: str;
-    idx?: num;
 }
+
+type DataDict = Dict<Task | List | Group | Timer>;

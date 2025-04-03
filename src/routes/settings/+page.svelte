@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { data, getData, groups, updItem, type _Group } from "$lib/store/store";
+    import { getData, groups, updItem, type _Group } from "$lib/store/store";
     import { useSortable } from "$lib/util/sortable.util.svelte";
     import { uuid } from "$lib/util/utils.util";
 

@@ -1,8 +1,17 @@
 <script lang="ts">
-    import { updItem, type _List } from '$lib/store/store';
+    import { getData, updItem, type _List } from '$lib/store/store';
     import { useSortable } from '$lib/util/sortable.util.svelte';
     import { uuid } from '$lib/util/utils.util';
-    import { onMount } from 'svelte';
+
+    const colors = [
+        "bg-gray-800",
+        "bg-lime-600",
+        "bg-red-400",
+        "bg-cyan-500",
+        "bg-violet-500 ",
+        "bg-pink-500",
+        "bg-stone-50",
+    ]
 
     function addItem(text: string) {
         if (!text.trim()) return;
@@ -45,13 +54,18 @@
             put: true,
         },
         onEnd(e) {
-            // items = reorder(items, e)
+            const id = e.item.attributes.getNamedItem('data-id')?.value;
+            if (!id) return;
+
+            let i = (e.newIndex || 0)
+                + (e.oldIndex! > e.newIndex! ? -0.5 : 0.5);
+
+            updItem({
+                ...getData()[id],
+                idx: i,
+            })
         }
     });
-
-    onMount(() => {
-
-    })
 </script>
 
 <div class="p-3.5 shadow-md bg-gray-800">
@@ -85,6 +99,7 @@
         {#each list.tasks as item (item)}
             <li
                 class="flex items-center pl-2 border border-gray-200 rounded-md transition duration-200"
+                data-id={item.id}
             >
                 <div class="sort-handle flex items-center mr-2 hover:cursor-move">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" class="size-[1em] inline-block">
@@ -97,7 +112,31 @@
                     checked={item.done}
                     onchange={() => updItem({ id: item.id, done: !item.done })}
                 />
-                <span class="ml-3 flex-grow {item.done ? 'line-through text-gray-500' : ''}" >
+
+                <details class="dropdown" style="margin: 0;">
+                    <div class="
+
+                    ">
+
+                    </div>
+                    <summary style="padding: 0; height: auto;" class="ml-1">
+                        <div class="{colors[item.clr || 0]} {item.clr || 0 ? 'hover:opacity-50' : 'hover:bg-gray-700'} size-4.5 rounded-xs"></div>
+                    </summary>
+                    <ul style="margin: 0;">
+                        {#each colors as clr, i}
+                            <!-- svelte-ignore a11y_click_events_have_key_events -->
+                            <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
+                            <li
+                                class="{clr} min-w-10 min-h-6 hover:opacity-85 active:opacity-60 cursor-pointer"
+                                onclick={() => {
+                                    updItem({...item, clr: i })
+                                }}
+                            ></li>
+                        {/each}
+                    </ul>
+                </details>
+
+                <span class="ml-2.5 flex-grow {item.done ? 'line-through text-gray-500' : ''}" >
                     {#if item.id === taskEditId}
                     <!-- svelte-ignore a11y_no_redundant_roles -->
                     <fieldset role="group" style="margin-bottom: 0.5rem;">
@@ -120,7 +159,10 @@
                     </fieldset>
                     {:else}
                     <div class="flex justify-between">
-                        <span class="my-auto whitespace-pre-line py-1.5">{item.txt}</span>
+                        <span
+                            class="my-auto whitespace-pre-line py-1.5"
+                            style="word-break: break-word;"
+                        >{item.txt}</span>
 
                         {#if taskDelId === item.id}
                         <button
@@ -162,8 +204,8 @@
                                     onclick={() => {
                                         taskDelId = item.id;
                                         taskDelWait = true;
-                                        setTimeout(() => taskDelId === item.id && (taskDelWait = false), 800)
-                                        setTimeout(() => taskDelId === item.id && (taskDelId = null), 3000)
+                                        setTimeout(() => taskDelId === item.id && (taskDelWait = false), 500)
+                                        setTimeout(() => taskDelId === item.id && (taskDelId = null), 2500)
                                     }}
                                 >
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-[1.5em] inline-block">

@@ -1,16 +1,15 @@
 import { lsWritable } from "$lib/util/store.util";
-import { debounceById } from "$lib/util/utils.util";
 import { writable } from "svelte/store";
+import { data, initTimer, timer } from "./data.store";
 
-export const listIsOpen = lsWritable<Dict<bol>>({}, 'listIsOpen')
 
-type DataDict = Dict<Task | List | Group>;
-export const data = lsWritable<DataDict>({}, 'data-dict');
-data.subscribe(dict => debounceById(() => updData(dict), 0, 'sub-data-dict'));
+
+export const listIsOpen = lsWritable<Dict<bol>>({}, 'listIsOpen');
 
 export const groups = writable<_Group[]>([]);
 export const lists = writable<Dict<_List>>({});
-// export const tasks = writable<Dict<Task>>({});
+export const tasks = writable<Dict<Task>>({});
+
 
 export type _Group = Group & { lists: _List[]; nDone: num; nTasks: num; };
 export type _List = List & { tasks: Task[]; nDone: num; nTasks: num; };
@@ -18,16 +17,19 @@ export type _List = List & { tasks: Task[]; nDone: num; nTasks: num; };
 type PartialExcept<T, K extends keyof T> = Partial<T> & Pick<T, K>;
 
 export function updItem(
-    x: PartialExcept<Task | List | Group, 'id'>,
-    act: 'del' | 'upd' = 'upd', doSet = true
+    x: PartialExcept<Task | List | Group | Timer, 'id'>,
+    act: 'del' | 'upd' = 'upd',
+    doSet = true
 ) {
-    if (act === 'del') {
-        delete _data[x.id];
-    } else {
-        (_data as any)[x.id] = { ..._data[x.id], ...x }
+    const o = {
+        ..._data[x.id],
+        ...x,
+        time: Date.now()
     }
 
-    // log(JSON.parse(JSON.stringify(_data)))
+    if (act === 'del') o.del = true;
+
+    (_data as any)[x.id] = o;
     if (doSet) data.set(_data);
 };
 
@@ -35,77 +37,104 @@ export function updMulti(
     arr: ['del' | 'upd', PartialExcept<Task | List | Group, 'id'>][]
 ) {
     arr.forEach(([act, data]) => updItem(data, act, false));
-    data.set(_data);
+    updData(_data);
 }
 
 export const getData = () => _data;
 
 let _data: DataDict = {};
-function updData(dict: DataDict) {
-    console.log('--- UPDATE ---', JSON.parse(JSON.stringify(dict)));
-    _data = dict;
+setTimeout(() => {
+    timer.subscribe(x => {
+        if (_data['TIMER']?.time === x.time) return;
+        console.log(x)
 
-    const t = new Map<str, Task>();
-    const l = new Map<str, _List>();
-    const g = new Map<str, _Group>();
+        _data['TIMER'] = x;
+        updData(_data);
+    });
+});
+
+export function updData(dict: DataDict) {
+    _data = dict;
+    console.log(
+        '--- updData ---',
+        // JSON.parse(JSON.stringify(dict))
+    );
+
+    const n = (x: num | undefined) => x as num > -1 ? x as num : Infinity;
+    const updates: ['del' | 'upd', (Task | List | Group)][] = [];
+
+    const u = {
+        tasks: {} as Dict<Task>,
+        lists: {} as Dict<_List>,
+        groups: {} as Dict<_Group>,
+        timer: dict['TIMER'] as Timer || initTimer,
+    }
 
     for (let id in dict) {
         const x = dict[id];
         switch (x.t) {
             case 'T':
-                t.set(x.id, x);
+                u.tasks[x.id] = x;
                 break;
             case 'L':
-                l.set(x.id, {...x, tasks: [], nTasks: 0, nDone: 0 });
+                u.lists[x.id] = {...x, tasks: [], nTasks: 0, nDone: 0 };
                 break;
             case 'G':
-                g.set(x.id, {...x, lists: [], nTasks: 0, nDone: 0 });
+                u.groups[x.id] = {...x, lists: [], nTasks: 0, nDone: 0 }
                 break;
         }
     }
 
-    const updates: ['del' | 'upd', (Task | List | Group)][] = [];
 
-    t.forEach(x => {
-        const list = l.get(x.listId);
-        if (!list) return updates.push(['del', x]);
+    Object.values(u.tasks).map(t => {
+        const list = u.lists[t.listId];
+        if (!list || list.del && !t.del) return updates.push(['del', t]);
 
-        list.tasks.push(x);
+        list.tasks.push(t);
     });
 
-    const n = (x: num | undefined) => x as num > -1 ? x as num : Infinity;
+    Object.values(u.lists).map(l => {
+        const group = u.groups[l.groupId];
+        if (!group || group.del && !l.del) return updates.push(['del', l]);
 
-    l.forEach(x => {
-        const group = g.get(x.groupId);
-        if (!group) return updates.push(['del', x]);
+        l.tasks = l.tasks
+            .filter(t => !t.del)
+            .sort((a, b) => n(a.idx) - n(b.idx));
 
-        x.tasks = x.tasks.sort((a, b) => (a.idx || 9999) - (b.idx || 9999));
-        x.nTasks = x.tasks.length
-        x.nDone = x.tasks.filter(x => x.done).length;
+        l.nTasks = l.tasks.length
+        l.nDone = l.tasks.filter(x => x.done).length;
 
-        group.lists.push(x);
+        l.tasks.forEach((t, i) =>
+            t.idx !== i && updates.push(['upd', {...t, idx: i}]))
+
+        group.lists.push(l);
     });
 
-    let updateData: _Group[] = [];
+    Object.values(u.groups).map(g => {
+        g.lists = g.lists
+            .filter(l => !l.del)
+            .sort((a, b) => n(a.idx) - n(b.idx));
 
-    g.forEach(x => {
-        x.lists = x.lists.sort((a, b) => n(a.idx) - n(b.idx));
-        x.lists.forEach((l, i) => {
-            x.nTasks += l.nTasks;
-            x.nDone += l.nDone;
+        g.lists.forEach((l, i) => {
+            g.nTasks += l.nTasks;
+            g.nDone += l.nDone;
 
             if (l.idx !== i) updates.push(['upd', {...l, idx: i}])
         });
-
-        updateData.push(x);
     });
 
-    updateData = updateData.sort((a, b) => n(a.idx) - n(b.idx));
-    updateData.forEach((x, i) => x.idx !== i && updates.push(['upd', {...x, idx: i}]));
+    const groupArr = Object.values(u.groups)
+        .filter(g => !g.del)
+        .sort((a, b) => n(a.idx) - n(b.idx));
 
-    if (updates.length)
+    groupArr.forEach((x, i) => x.idx !== i && updates.push(['upd', {...x, idx: i}]));
+
+    if (updates.length) {
         updMulti(updates);
-    else {
-        groups.set(updateData);
+    } else {
+        groups.set(groupArr);
+        lists.set(u.lists);
+        tasks.set(u.tasks);
+        timer.set(u.timer);
     }
 }
