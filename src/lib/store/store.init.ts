@@ -3,6 +3,7 @@ import { audio, data, playSound, timer } from "./data.store";
 import { getData, updData } from "./store";
 
 export function initStore() {
+    let isFistRun = true
     let prevState = 'PAUSE' as Timer['state'];
     let prevTime = 0;
     timer.subscribe(x => {
@@ -11,12 +12,13 @@ export function initStore() {
 
         if (prevTime === x.time) return;
 
-        if (x.state !== prevState && x.state === 'PAUSE') {
-            audio.pause();
-        } else {
-            playSound(x.sound_start, x.sound_startTimes);
-        }
+        if (!isFistRun && x.state !== prevState)
+            if (x.state === 'PAUSE')
+                audio.pause();
+            else
+                playSound(x.sound_start, x.sound_startTimes);
 
+        isFistRun = false;
         prevTime = x.time;
         prevState = x.state;
 
