@@ -26,6 +26,7 @@ const config = {
 		prerender: {
 			crawl: false,
 			entries: [
+					'/',
 					'/data/sounds.json',
 				],
 			},
