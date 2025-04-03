@@ -21,9 +21,9 @@ export const initTimer: Timer = {
     rest: 5 * 60 * 1000,
     start: Date.now(),
     state: 'PAUSE',
-    sound_start: 'sounds/default.wav',
+    sound_start: '/sounds/default.wav',
     sound_startTimes: 2,
-    sound_end: 'sounds/default.wav',
+    sound_end: '/sounds/default.wav',
     sound_endTimes: 2,
 }
 
@@ -34,7 +34,7 @@ export const _time = writable<_Time>({
     mode: true,
 });
 
-export let audio = (browser ? new AudioWrapper('sounds/default.wav') : {}) as AudioWrapper;
+export let audio = (browser ? new AudioWrapper('/sounds/default.wav') : {}) as AudioWrapper;
 
 let soundId = 0;
 export const playSound = async (
