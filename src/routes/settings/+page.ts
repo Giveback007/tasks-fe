@@ -1,3 +1,5 @@
+export const prerender = true;
+
 export async function load({ fetch }) {
     let data: {
         sounds: str | { file: str; name: str }[]

@@ -18,18 +18,23 @@ const config = {
 		adapter: adapter({
 			pages: 'build',
 			assets: 'build',
-
-			// ! NOTE:
-			/** DO NOT NAME THIS index.html (it will override the pre-rendered index.html) */
-			fallback: "CSR.html",
+			fallback: "index.html",
 		}),
 		prerender: {
 			crawl: false,
 			entries: [
-					'/',
-					'/data/sounds.json',
-				],
-			},
+				'/',
+				'/settings',
+				'/data/sounds.json',
+			],
+		},
+		// Add this to disable SvelteKit's default service worker
+		serviceWorker: {
+			register: false
+		},
+		files: {
+			serviceWorker: 'src/sw.js', // or `src/my-sw.ts`
+		}
 	}
 };
 
