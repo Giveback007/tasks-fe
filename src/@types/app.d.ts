@@ -41,3 +41,5 @@ type Group = _Base & {
 
 type AllData = Task | List | Group | Timer;
 type DataDict = Dict<AllData>;
+
+type Theme = 'dark' | 'light';

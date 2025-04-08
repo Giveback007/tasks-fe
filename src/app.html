@@ -1,11 +1,28 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="dark" class="dark">
 	<head>
 		<meta charset="utf-8" />
 		<link rel="icon" href="%sveltekit.assets%/favicon.png" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<title>Tasks</title>
 		%sveltekit.head%
+
+		<script>
+			globalThis.changeTheme = (theme) => {
+				theme = theme || localStorage.getItem('theme') || 'dark';
+				const drk = theme === 'dark';
+				const htmlEl = document.documentElement;
+
+				htmlEl.classList.remove(drk ? 'light' : 'dark');
+				htmlEl.classList.add(drk ? 'dark' : 'light');
+				htmlEl.attributes.se
+
+				localStorage.setItem('theme', theme)
+				htmlEl.setAttribute('data-theme', theme)
+			}
+
+			changeTheme(localStorage.getItem('theme'));
+		</script>
 	</head>
 	<body data-sveltekit-preload-data="hover">
 		<div style="display: contents">%sveltekit.body%</div>

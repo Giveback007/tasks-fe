@@ -8,6 +8,9 @@
 	import { pwaInfo } from "virtual:pwa-info";
 	import { pwaAssetsHead } from "virtual:pwa-assets/head";
 	(globalThis as any).log = console.log;
+	(globalThis as any).darkMode = () => {
+
+	}
 
 	const webManifestLink = $derived(pwaInfo ? pwaInfo.webManifest.linkTag : "",);
 

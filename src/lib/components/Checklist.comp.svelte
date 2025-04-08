@@ -59,7 +59,7 @@
     });
 </script>
 
-<div class="p-3.5 shadow-md bg-gray-800">
+<div class="p-3.5 shadow-md bg-gray-200 dark:bg-gray-800">
     <!-- <strong class="font-bold pl-1">My Checklist</strong> -->
 
     <div class="mt-2 mb-0.5">

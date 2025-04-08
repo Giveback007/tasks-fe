@@ -11,20 +11,24 @@
 
 <div id="clock" class="bg-deep-purple text-center pb-3 max-w-96 sm:max-w-screen mx-auto">
     <div class="mx-auto relative">
-      <div id="timer" class="filter drop-shadow text-7xl font-overpass-mono absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">{$_time.timeRemaining}</div>
-      <div class="w-full xs:w-3/4 sm:w-3/5 md:w-1/2 lg:w-2/5 xl:w-1/3 mx-auto">
-        <svg viewBox="0 0 39 39" id="timerRing" fill="none" class="">
-          <defs>
-            <linearGradient id="timer-ring-gradient">
-                <stop offset="0%" stop-color="#FFB56B" />
-                <stop offset="30%" stop-color="#BC365D" />
-                <stop offset="100%" stop-color="#1F005C" />
-            </linearGradient>
-          </defs>
-          <circle id="shadow-circle" class="filter drop-shadow" stroke="#2D2D2D" stroke-width="3px" cx="50%" cy="50%" r="15.9155"/>
-          <circle id="timer-circle" class="-rotate-90 origin-center {$_time.mode ? '' : 'hidden'}" stroke="url(#timer-ring-gradient)" stroke-dasharray="{$_time.prc}, 100" stroke-width="3px" stroke-linecap="round" cx="50%" cy="50%" r="15.9155"/>
-        </svg>
-      </div>
+        <div
+            id="timer"
+            class="filter drop-shadow text-7xl font-overpass-mono absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
+            style="text-shadow: 0px 1px 0px rgb(0 0 0 / 0.075), 0px 1px 1px rgb(0 0 0 / 0.075), 0px 2px 2px rgb(0 0 0 / 0.075);"
+        >{$_time.timeRemaining}</div>
+        <div class="w-full xs:w-3/4 sm:w-3/5 md:w-1/2 lg:w-2/5 xl:w-1/3 mx-auto">
+            <svg viewBox="0 0 39 39" id="timerRing" fill="none" class="">
+                <defs>
+                    <linearGradient id="timer-ring-gradient">
+                        <stop offset="0%" stop-color="#FFB56B" />
+                        <stop offset="30%" stop-color="#BC365D" />
+                        <stop offset="100%" stop-color="#1F005C" />
+                    </linearGradient>
+                </defs>
+                <circle id="shadow-circle" class="filter drop-shadow" stroke="#2D2D2D" stroke-width="3px" cx="50%" cy="50%" r="15.9155"/>
+                <circle id="timer-circle" class="-rotate-90 origin-center {$_time.mode ? '' : 'hidden'}" stroke="url(#timer-ring-gradient)" stroke-dasharray="{$_time.prc}, 100" stroke-width="3px" stroke-linecap="round" cx="50%" cy="50%" r="15.9155"/>
+            </svg>
+        </div>
     </div>
 </div>
 

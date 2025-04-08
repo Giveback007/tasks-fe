@@ -2,8 +2,7 @@
     import { page } from "$app/state";
     import { TIMER_STATE_TITLES } from "$lib/consts";
     import { _time, nextTimer, timer } from "$lib/store/data.store";
-    import { groups, updItem } from "$lib/store/store";
-    import { onDestroy, onMount } from "svelte";
+    import { groups } from "$lib/store/store";
 
     let groupTabs: [str, str][] = $state([]);
     let selGroup: str = $state("");
@@ -16,7 +15,7 @@
             groupTabs.push([`[${x.name} ${prc > -1 ? prc : 0}%]`, x.id])
         });
         selGroup = groups[0]?.id || "";
-    })
+    });
 
     const selGroupId: str | null = $derived(page.route.id === "/group/[id]" ? page.data?.id || null : null);
 </script>
@@ -46,7 +45,20 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
                             </svg>
                         {/if}
-                    </button><span class="hover:bg-gray-800 active:bg-gray-700 ml-0.5 py-1 px-1.5"><a href="/" style="text-decoration: none; color: white;">{$_time.timeRemaining}</a></span>
+                    </button><span class="
+                        hover:bg-gray-300 active:bg-gray-200
+                        ml-0.5 py-1 px-1.5 rounded-sm
+                        dark:hover:bg-gray-800 dark:active:bg-gray-700
+                    ">
+                        <a
+                            href="/"
+                            class="time-count"
+                            style="
+                                text-decoration: none;
+                                text-shadow: 0px 1px 0px rgb(0 0 0 / 0.075), 0px 1px 1px rgb(0 0 0 / 0.075), 0px 2px 2px rgb(0 0 0 / 0.075);
+                            "
+                        >{$_time.timeRemaining}</a>
+                    </span>
                 </strong>
             </li>
         </ul>
@@ -88,9 +100,19 @@
             </li>
         </ul>
     </nav>
-    {#if $_time.mode}
+    {#if $_time.mode && $timer.state !== 'PAUSE'}
         <progress value="{$_time.prc}" max="100" class="relative" style="border-radius: 0;"></progress>
     {:else}
         <progress value="0" max="100" class="relative" style="border-radius: 0;"></progress>
     {/if}
 </div>
+
+<style>
+    :global(.dark) .time-count {
+        color: white !important;
+    }
+
+    /* :global(.light) .time-count {
+        color: black !important;
+    } */
+</style>

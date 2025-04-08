@@ -20,9 +20,9 @@ export default defineConfig({
 				maximumFileSizeToCacheInBytes: 4 * 1_000_000,
 			},
 			manifest: {
-				name: 'Your App Name',
-				short_name: 'AppName',
-				description: 'Your app description',
+				name: 'Tasks',
+				short_name: 'Tasks',
+				description: 'Sync & share tasks & Pomodoro timer',
 				theme_color: '#ffffff',
 				background_color: '#ffffff',
 				icons: [
