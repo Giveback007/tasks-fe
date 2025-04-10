@@ -1,5 +1,6 @@
 <script lang="ts">
 	import "@picocss/pico";
+	import "@picocss/pico/css/pico.colors.min.css";
 	import "../app.css";
 	import Nav from "$lib/components/Nav.comp.svelte";
 	import { onMount } from "svelte";

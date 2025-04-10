@@ -17,8 +17,8 @@ function syncDict(ws: WebSocket, type: 'send' | 'receive') {
 
 
     allIds.forEach(id => {
-        const o1 = localDict[id] || { time: 0 } as Task | List | Group;
-        const o2 = serverDict[id] || { time: 0 } as Task | List | Group;
+        const o1 = localDict[id] || { time: 0 } as AllData;
+        const o2 = serverDict[id] || { time: 0 } as AllData;
         const o = o2.time > o1.time ? o2 : o1;
 
         if (!o.id) return;
@@ -28,6 +28,12 @@ function syncDict(ws: WebSocket, type: 'send' | 'receive') {
     });
 
     if (updates.length) {
+        // Trying to fix the Firefox bug for data sync (it's not working)
+        const t1 = localDict['TIMER'] || null as Timer | null;
+        const t2 = serverDict['TIMER'] || null as Timer | null;
+        if (t1 && t2) newDict['TIMER'] = t2.time > t1.time ? t2 : t1;
+        else if (t1 || t2) newDict['TIMER'] = t1 || t2;
+
         if (type === 'send')
             ws.send(JSON.stringify(newDict));
 
@@ -49,7 +55,7 @@ function connectWS() {
     });;
 
     ws.onmessage = (ev) => {
-        serverDict = JSON.parse(ev.data);
+        serverDict = {...serverDict, ...JSON.parse(ev.data)};
         syncDict(ws, 'receive');
     };
 

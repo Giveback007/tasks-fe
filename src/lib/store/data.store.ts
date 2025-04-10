@@ -1,7 +1,7 @@
 import { lsWritable } from "$lib/util/store.util";
-import { debounceById, formatTime, wait } from "$lib/util/utils.util";
+import { formatTime, wait } from "$lib/util/utils.util";
 import { writable } from "svelte/store";
-import { updData, updItem } from "./store";
+import { updItem } from "./store";
 import { AudioWrapper } from "$lib/util/audio.util";
 import { browser } from "$app/environment";
 
@@ -11,7 +11,7 @@ type _Time = {
     mode: bol;
 }
 
-export const data = lsWritable<DataDict>({}, 'data-dict');
+export const data = lsWritable<DataDict>({}, 'data-dict', false);
 
 export const initTimer: Timer = {
     id: 'TIMER',
@@ -27,7 +27,7 @@ export const initTimer: Timer = {
     sound_endTimes: 2,
 }
 
-export const timer = lsWritable<Timer>(initTimer, 'TIMER');
+export const timer = writable<Timer>(initTimer);
 export const _time = writable<_Time>({
     timeRemaining: '00:00',
     prc: 0,

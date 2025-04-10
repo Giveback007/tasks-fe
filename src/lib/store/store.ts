@@ -3,12 +3,11 @@ import { writable } from "svelte/store";
 import { data, initTimer, timer } from "./data.store";
 import { debounceById } from "$lib/util/utils.util";
 
-export const listIsOpen = lsWritable<Dict<bol>>({}, 'listIsOpen');
+export const listIsOpen = lsWritable<Dict<bol>>({}, 'listIsOpen', false);
 
 export const groups = writable<_Group[]>([]);
 export const lists = writable<Dict<_List>>({});
 export const tasks = writable<Dict<Task>>({});
-
 
 export type _Group = Group & { lists: _List[]; nDone: num; nTasks: num; };
 export type _List = List & { tasks: Task[]; nDone: num; nTasks: num; };
@@ -35,15 +34,47 @@ export function updItem(
 export function updMulti(
     arr: ['del' | 'upd', PartialExcept<Task | List | Group, 'id'>][]
 ) {
-    arr.forEach(([act, data]) => updItem(data, act, false));
-    updData(_data);
+    arr.forEach(([act, data]) => updItem(data, act));
+    // updData(_data);
 }
 
 export const getData = () => _data;
 
+// const getTime = (n: number) => new Date(n).toISOString().split('T')[1].replace('Z', '')
+
 let _data: DataDict = {};
+let _prevData: DataDict = {}; // TEMP FIX FOR A BUG
 export function updData(dict: DataDict) {
-    _data = dict;
+    const allIds = new Set([
+        ...Object.values(dict),
+        ...Object.values(_prevData),
+    ].map(x => x.id));
+
+    const newDict: DataDict = {};
+    allIds.forEach(id => {
+        const o1: AllData | null = dict[id] || null;
+        const o2: AllData | null = _prevData[id] || null;
+        // if (o1 && o2 && o1.t === 'timer') {
+        //     console.log('TIMER-1:', getTime(o1.time))
+        //     console.log('TIMER-1:', getTime(o2.time))
+        // }
+
+        let o: AllData | null = null;
+        if (o1 && o2) {
+            o = o2.time > o1.time ? o2 : o1;
+        } else {
+            o = o1 || o2;
+        }
+
+        if (!o) return;
+        newDict[o.id] = o;
+    });
+
+    _prevData = _data = {...newDict};
+
+    // console.log('TIMER-UPD:', getTime(_data.TIMER?.time || 0))
+
+
     console.log(
         '--- updData ---',
         // JSON.parse(JSON.stringify(dict))

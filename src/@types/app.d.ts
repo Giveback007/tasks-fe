@@ -31,6 +31,7 @@ type List = _Base & {
     t: 'L';
     name: str;
     groupId: str;
+    fcs?: bol;
     clr?: str;
 };
 

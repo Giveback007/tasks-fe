@@ -17,7 +17,7 @@ export const lStore = storageFactory('localStorage');
 export const sStore = storageFactory('sessionStorage');
 
 const lsWritableKeys = new Set<str>();
-export function lsWritable<T>(initState: T, id: str) {
+export function lsWritable<T>(initState: T, id: str, listenToLS = true) {
     // if (lsWritableKeys.has(id)) throw `This LS id is already in use: "${id}"`;
     if (!browser || !lStore.hasStore()) return writable<T>(initState);
 
@@ -29,7 +29,7 @@ export function lsWritable<T>(initState: T, id: str) {
     wr.subscribe(s => debounceById(() =>
         lStore.set(lsKeyId, s === null ? '__null__' : s), 50, lsKeyId));
 
-    addEventListener("storage", ({ key, newValue: x }) => key === lsKeyId && debounceById(() => {
+    if (listenToLS) addEventListener("storage", ({ key, newValue: x }) => key === lsKeyId && debounceById(() => {
         console.log(key, x)
         if (x === null) throw 'newValue should not be: null';
         if (x === '__null__') return wr.set(null as T);

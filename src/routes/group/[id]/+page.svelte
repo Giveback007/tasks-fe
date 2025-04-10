@@ -4,8 +4,9 @@
     import Tabs from "$lib/components/Tabs.comp.svelte";
     import { getData, groups, listIsOpen, updItem, updMulti, type _List } from "$lib/store/store";
     import { useSortable } from "$lib/util/sortable.util.svelte";
-    import { debounceById, uuid } from "$lib/util/utils.util";
+    import { uuid } from "$lib/util/utils.util";
     import type { PageData } from "./$types";
+    import TableBtn from "./TableBtn.comp.svelte";
 
     const {
         data: pageData
@@ -77,27 +78,48 @@
 <h1>No Group Found</h1>
 {/if}
 
-{#if group && selTab === 'tasks'}
-    {#each lists as list}
-        {@const prc = Math.round(list.nDone / list.nTasks * 100)}
-        <details
-            bind:open={$listIsOpen[list.id]}
-            name={list.name}
-            style="margin: 0.25rem;"
-        >
-            <!-- svelte-ignore a11y_no_redundant_roles -->
-            <summary role="button" style="margin: 0; border-radius: 0;" class="flex">
-                <div class="flex flex-1">
-                    <div class="{list.clr} size-6 mr-2 my-auto rounded-md"></div>
-                    <div class="align-middle my-auto pt-0.5">
-                        <strong>{list.name}:</strong>
-                        {list.nDone}/{list.tasks.length}
-                        {prc > -1 ? prc : 100}%
-                    </div>
+{#snippet detailChecklist(list: _List)}
+    {@const prc = Math.round(list.nDone / list.nTasks * 100)}
+    <details
+        bind:open={$listIsOpen[list.id]}
+        name={list.name}
+        style="margin: 0.25rem;"
+    >
+        <!-- svelte-ignore a11y_no_redundant_roles -->
+        <summary role="button" style="margin: 0; border-radius: 0;" class="flex">
+            <div class="flex flex-1">
+                <div class="{list.clr} size-6 mr-2 my-auto rounded-md"></div>
+                <div class="align-middle my-auto pt-0.5">
+                    <strong>{list.name}:</strong>
+                    {list.nDone}/{list.tasks.length}
+                    {prc > -1 ? prc : 100}%
                 </div>
-            </summary>
-            <Checklist list={list} />
-        </details>
+            </div>
+        </summary>
+        <Checklist list={list} />
+    </details>
+{/snippet}
+
+{#if group && selTab === 'tasks'}
+    <h4>
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-[1.25em] inline-block mb-[0.1em]">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+        </svg>
+        Focus:
+    </h4>
+    {#each lists.filter(x => x.fcs) as list}
+        {@render detailChecklist(list)}
+    {/each}
+    <hr>
+    <h4>
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-[1.25em] inline-block mb-[0.1em]">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0ZM3.75 12h.007v.008H3.75V12Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm-.375 5.25h.007v.008H3.75v-.008Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
+        </svg>
+        Other:
+    </h4>
+    {#each lists.filter(x => !x.fcs) as list}
+        {@render detailChecklist(list)}
     {/each}
 {/if}
 
@@ -144,14 +166,24 @@
                 <td class="w-6" style="padding: 0 0.25rem;">
                     <div role="group" style="margin: 0;">
 
-                        <button
-                            aria-label="edit-group"
-                            class="{list.id === resetTasks ? '' : 'outline contrast'}"
-                            style="padding: 0.35rem 0.5rem;"
+                        <TableBtn
+                            class={list.fcs ? 'pico-background-jade-350' : 'outline contrast'}
+                            onclick={() => {
+                                updItem({ ...list, fcs: !list.fcs })
+                            }}
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6" >
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                            </svg>
+                        </TableBtn>
+
+                        <TableBtn
+                            class={list.id === resetTasks ? '' : 'outline contrast'}
                             onclick={() => {
                                 if (resetTasks !== list.id) {
                                     resetTasks = list.id
-                                    setTimeout(() => resetTasks === list.id && (resetTasks = null), 2500)
+                                    setTimeout(() => resetTasks === list.id && (resetTasks = null), 1500)
                                 } else {
                                     // reset all the tasks
                                     updMulti(list.tasks.map(t => ['upd', { ...t, done: false }]))
@@ -163,12 +195,10 @@
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
                             </svg>
-                        </button>
+                        </TableBtn>
 
-                        <button
-                            aria-label="edit-group"
+                        <TableBtn
                             class="outline contrast"
-                            style="padding: 0.35rem 0.5rem;"
                             onclick={() => {
                                 editModal = list;
                                 newName = list.name;
@@ -178,18 +208,16 @@
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="ml-[0.1em] size-[1.5em] inline-block">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
                             </svg>
-                        </button>
+                        </TableBtn>
 
-                        <button
-                            aria-label="edit-group"
+                        <TableBtn
                             class="outline contrast"
-                            style="padding: 0.35rem 0.5rem;"
                             onclick={() => delModal = list}
                         >
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
                             </svg>
-                        </button>
+                        </TableBtn>
 
                     </div>
                 </td>

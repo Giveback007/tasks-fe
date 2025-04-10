@@ -11,7 +11,15 @@
         groupTabs = [];
 
         groups.map((x) => {
-            const prc = Math.round(x.nDone / x.nTasks * 100)
+            let nTasks = 0;
+            let nDone = 0;
+            x.lists.map(l => {
+                if (!l.fcs) return;
+                nTasks += l.nTasks;
+                nDone += l.nDone;
+            })
+
+            const prc = Math.round(nDone / nTasks * 100)
             groupTabs.push([`[${x.name} ${prc > -1 ? prc : 0}%]`, x.id])
         });
         selGroup = groups[0]?.id || "";
