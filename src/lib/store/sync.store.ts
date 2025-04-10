@@ -15,6 +15,7 @@ function syncDict(ws: WebSocket, type: 'send' | 'receive') {
         ...Object.values(localDict),
     ].map(x => x.id));
 
+
     allIds.forEach(id => {
         const o1 = localDict[id] || { time: 0 } as Task | List | Group;
         const o2 = serverDict[id] || { time: 0 } as Task | List | Group;
@@ -35,17 +36,27 @@ function syncDict(ws: WebSocket, type: 'send' | 'receive') {
     }
 }
 
-export function initStoreSync() {
-    const ws = new WebSocket(PUBLIC_WS);
-    ws.addEventListener('open', () => {
-        data.subscribe(dict => {
-            localDict = dict;
-            debounceById(() => syncDict(ws, 'send'), 0, 'ws-data-dict')
-        });
-    });
+let ws: WebSocket
+function connectWS() {
+    if (ws && !(ws.readyState === ws.CLOSED)) return;
 
-    ws.addEventListener('message', (event) => {
-        serverDict = JSON.parse(event.data);
+    ws = new WebSocket(PUBLIC_WS);
+    let unSub: null | (() => any) = null;
+
+    ws.onopen = () => unSub = data.subscribe(dict => {
+        localDict = dict;
+        debounceById(() => syncDict(ws, 'send'), 0, 'ws-data-dict')
+    });;
+
+    ws.onmessage = (ev) => {
+        serverDict = JSON.parse(ev.data);
         syncDict(ws, 'receive');
-    });
+    };
+
+    ws.onclose = () => unSub?.();
 }
+
+export function initStoreSync() {
+    connectWS();
+    setInterval(connectWS, 2500)
+};
