@@ -1,6 +1,7 @@
 import { lsWritable } from "$lib/util/store.util";
 import { writable } from "svelte/store";
 import { data, initTimer, timer } from "./data.store";
+import { debounceById } from "$lib/util/utils.util";
 
 export const listIsOpen = lsWritable<Dict<bol>>({}, 'listIsOpen');
 
@@ -28,7 +29,7 @@ export function updItem(
     if (act === 'del') o.del = true;
 
     (_data as any)[x.id] = o;
-    if (doSet) data.set(_data);
+    if (doSet) debounceById(() => data.set(_data), 0, 'updItem')
 };
 
 export function updMulti(

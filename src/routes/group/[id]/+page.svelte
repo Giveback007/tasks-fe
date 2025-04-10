@@ -64,7 +64,6 @@
         }
     });
 
-    const elms: Dict<HTMLButtonElement> = {};
     let resetTasks: null | str = $state(null)
 </script>
 
@@ -149,8 +148,6 @@
                             aria-label="edit-group"
                             class="{list.id === resetTasks ? '' : 'outline contrast'}"
                             style="padding: 0.35rem 0.5rem;"
-                            bind:this={elms[`${list.id}::reset-tasks`]}
-
                             onclick={() => {
                                 if (resetTasks !== list.id) {
                                     resetTasks = list.id
@@ -158,6 +155,7 @@
                                 } else {
                                     // reset all the tasks
                                     updMulti(list.tasks.map(t => ['upd', { ...t, done: false }]))
+                                    list.tasks.map(t => updItem({ ...t, done: false }))
                                     resetTasks = null
                                 }
                             }}

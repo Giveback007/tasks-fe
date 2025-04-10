@@ -179,7 +179,7 @@
                                     onclick={() => {
                                         taskDelId = item.id;
                                         taskDelWait = true;
-                                        setTimeout(() => taskDelId === item.id && (taskDelWait = false), 500)
+                                        setTimeout(() => taskDelId === item.id && (taskDelWait = false), 350)
                                         setTimeout(() => taskDelId === item.id && (taskDelId = null), 2500)
                                     }}
                                 >
