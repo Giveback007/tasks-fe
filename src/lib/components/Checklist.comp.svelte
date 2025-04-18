@@ -24,9 +24,11 @@
     }
 
     let {
-        list
+        list,
+        showChecked = true,
     } : {
-        list: _List
+        list: _List;
+        showChecked?: boolean;
     } = $props();
 
     let newItemText = $state("");
@@ -89,6 +91,7 @@
     <ul bind:this={listElm} style="margin: 0;">
         {#each list.tasks as item (item)}
             <li
+                class:hidden={!showChecked && item.done}
                 class="flex items-center pl-2 border border-gray-200 rounded-md transition duration-200"
                 data-id={item.id}
             >

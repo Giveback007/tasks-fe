@@ -12,6 +12,7 @@
 
     let {
         class: className = '',
+        style,
         btnClass = '',
         selClass = 'outline',
         selBtn,
@@ -23,6 +24,7 @@
         onTabClick,
     }: {
         class?: str;
+        style?: string | undefined | null;
         btnSize?: Size | 'auto';
 
         /** Css classes that are used by both selected and unselected buttons */
@@ -42,21 +44,21 @@
     } = $props();
 </script>
 
-<div class={className}>
+<div class={className} {style} role="group">
     {#each tabs as tab (tab[0])}
-    {@const [name, id, fct] = tab}
-      <Button
-        onclick={fct ? () => {
-            fct(id);
-            onTabClick?.(tab);
-        } : () => {
-            selId = id;
-            onTabClick?.(tab);
-        }}
-        class={[btnClass, id === selId ? selClass : unSelClass]}
-        btnType={id === selId ? selBtn : unSelBtn}
-        size={btnSize}
-      >{@render renderName(name)}</Button>
+        {@const [name, id, fct] = tab}
+        <Button
+            onclick={fct ? () => {
+                fct(id);
+                onTabClick?.(tab);
+            } : () => {
+                selId = id;
+                onTabClick?.(tab);
+            }}
+            class={[btnClass, id === selId ? selClass : unSelClass]}
+            btnType={id === selId ? selBtn : unSelBtn}
+            size={btnSize}
+        >{@render renderName(name)}</Button>
     {/each}
 </div>
 

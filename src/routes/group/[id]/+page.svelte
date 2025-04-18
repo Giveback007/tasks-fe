@@ -1,4 +1,5 @@
 <script lang="ts">
+    import Button from "$lib/components/Button.comp.svelte";
     import Checklist from "$lib/components/Checklist.comp.svelte";
     import ColorsSel from "$lib/components/ColorsSel.comp.svelte";
     import Tabs from "$lib/components/Tabs.comp.svelte";
@@ -65,14 +66,27 @@
         }
     });
 
-    let resetTasks: null | str = $state(null)
+    let resetTasks: null | str = $state(null);
+    let showChecked = $state(false);
 </script>
 
 {#if group}
-<Tabs
-    tabs={[['Lists', 'lists'], ['Tasks', 'tasks']]}
-    bind:selId={selTab}
-/>
+<div class="flex justify-between mx-1">
+    <Tabs
+        tabs={[['Lists', 'lists'], ['Tasks', 'tasks']]}
+        bind:selId={selTab}
+        class="max-w-52"
+        style="margin-bottom: 0;"
+    />
+    <Button
+        class={showChecked ? "" : "outline"}
+        onclick={() => showChecked = !showChecked}
+    >
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-[1.5em] inline-block">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+        </svg>
+    </Button>
+</div>
 <hr />
 {:else}
 <h1>No Group Found</h1>
@@ -96,7 +110,7 @@
                 </div>
             </div>
         </summary>
-        <Checklist list={list} />
+        <Checklist list={list} {showChecked} />
     </details>
 {/snippet}
 
